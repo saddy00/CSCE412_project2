@@ -9,6 +9,7 @@ In this project, we will learn how to model a simulation of a large company's lo
 This project will require a real-world implementation of a queue. We also need a struct, a lower-level data structure that allows data to be contained in an object.
 
 Load balancers are available commercially, but in this project, you will build one that has:
+
 ● Requests - generates random IP addresses, both in and out, and random times for each request to be processed.
 o IP in (CREATE RANDOM 0-255)
 o IP out (CREATE RANDOM 0-255)
