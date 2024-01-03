@@ -10,13 +10,15 @@ This project will require a real-world implementation of a queue. We also need a
 
 Load balancers are available commercially, but in this project, you will build one that has:
 ● Requests - generates random IP addresses, both in and out, and random times for each request to be processed.
-o IP in
-o IP out
-o Time (integer)
+o IP in (CREATE RANDOM 0-255)
+o IP out (CREATE RANDOM 0-255)
+o Time (integer) (RANDOM 4-100)
+
 ● Webserver(s)
 o Takes requests from the Load Balancer
 o Process the requests
 o Asks for another
+
 ● Load Balancer
 o Queue of requests
 o Keeps track of time.
@@ -42,7 +44,7 @@ full queue (usually servers * 20).
 7. You will need a queue of type request. (called requestqueue?)
 8. You will need a loadbalancer class that manages the webservers and the request queue.
 9. You will need to add new requests at random times to simulate new requests after the initial full queue you set up.
-10. Exit when the queue is empty and all requests have been completed.
+10. (DO NOT DO THIS) Exit when the queue is empty and all requests have been completed.
 11. Try different numbers as input to understand the capacity of your loadbalancer configurations.
 12. All files must be commented with Doxygen using HTML output and loaded to a page on people.tamu.edu. Turn in this link.
 13. Demo the load balancer in class
