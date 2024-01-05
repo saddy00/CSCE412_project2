@@ -1,4 +1,5 @@
 #include "loadbalancer.h"
+#include <functional> 
 
 LoadBalancer::LoadBalancer(int numberOfServers, int runTime) : runTime(runTime) {
     for (int i = 0; i < numberOfServers; ++i) {
@@ -28,21 +29,32 @@ void LoadBalancer::run() {
     int currentCycle = 0;
 
     // Initially assign requests to all servers
-    for (auto &server : webServers) {
+    for (int i = 0; i < webServers.size(); ++i) {
         if (!requestQueue.empty()) {
-            server.processRequest(requestQueue.front());
+            webServers[i].startProcessing(requestQueue.front());
+            int completionTime = currentCycle + webServers[i].getExpectedCompletionTime();
+            taskQueue.push(ServerTask(i+1, completionTime));
             requestQueue.pop();
         }
     }
 
-    while (currentCycle < runTime && !requestQueue.empty()) {
-        for (auto &server : webServers) {
-            server.update(); // Update each server's status
-
-            if (server.isAvailable() && !requestQueue.empty()) {
-                server.processRequest(requestQueue.front());
-                requestQueue.pop();
+    while (currentCycle < runTime && (!requestQueue.empty() || !taskQueue.empty())) {
+        if (!taskQueue.empty()) {
+            ServerTask currentTask = taskQueue.top();
+            if (currentTask.completionTime <= currentCycle) {
+                taskQueue.pop();
+                // Check if more requests are pending
+                if (!requestQueue.empty()) {
+                    webServers[currentTask.serverID - 1].startProcessing(requestQueue.front());
+                    int newCompletionTime = currentCycle + webServers[currentTask.serverID - 1].getExpectedCompletionTime();
+                    taskQueue.push(ServerTask(currentTask.serverID, newCompletionTime));
+                    requestQueue.pop();
+                }
             }
+        }
+        // Update all servers
+        for (auto &server : webServers) {
+            server.update();
         }
 
         // Print status of each web server
@@ -51,7 +63,6 @@ void LoadBalancer::run() {
         // Simulate the passage of one clock cycle
         currentCycle++;
     }
-
     std::cout << "Load balancer run completed." << std::endl;
 }
 

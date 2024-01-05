@@ -12,11 +12,14 @@ public:
     bool isAvailable() const;
     void update();
     // void displayRequestDetails(const Request& request) const;
+    int getExpectedCompletionTime() const;
+    void startProcessing(const Request& request);
 private:
     bool available;
     int serverID;
     int processingTimeLeft; 
     void displayRequestDetails(const Request& request) const;
+    int expectedCompletionTime;
 };
 
 #endif

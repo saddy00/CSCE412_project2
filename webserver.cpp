@@ -13,10 +13,8 @@ void WebServer::processRequest(const Request& request) {
     std::random_device rd;  // Obtain a random number from hardware
     std::mt19937 eng(rd()); // Seed the generator
     std::uniform_int_distribution<> distr(4, 100); // Define the range
-
     int processingTime = distr(eng);
-    std::this_thread::sleep_for(std::chrono::seconds(processingTime)); // Simulate processing
-
+    expectedCompletionTime = processingTimeLeft;
     std::cout << "WebServer " << serverID << " is done with a request after " << processingTime << " seconds; IP Out - " << request.getIPOut() << std::endl;
     available = true;
 }
@@ -28,6 +26,22 @@ void WebServer::update() {
             available = true;
         }
     }
+}
+
+void WebServer::startProcessing(const Request& request) {
+    available = false;
+    std::cout << "WebServer " << serverID << " is processing a request; IP In - " << request.getIPIn() << std::endl;
+
+    // Random processing time between 4 and 100 seconds
+    std::random_device rd;
+    std::mt19937 eng(rd());
+    std::uniform_int_distribution<> distr(4, 100);
+    processingTimeLeft = distr(eng);
+    expectedCompletionTime = processingTimeLeft; // Store the expected completion time
+}
+
+int WebServer::getExpectedCompletionTime() const {
+    return expectedCompletionTime;
 }
 
 bool WebServer::isAvailable() const {
