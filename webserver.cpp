@@ -1,22 +1,18 @@
 #include "webserver.h"
 #include <random>
 #include <chrono>
-#include <thread>
 
 WebServer::WebServer(int id) : available(true), serverID(id), processingTimeLeft(0) {}
 
 void WebServer::processRequest(const Request& request) {
     available = false;
+    currentIPOut = request.getIPOut();
     std::cout << "WebServer " << serverID << " is processing a request; IP In - " << request.getIPIn() << std::endl;
 
-    // Random processing time between 1 and 5 seconds
-    std::random_device rd;  // Obtain a random number from hardware
-    std::mt19937 eng(rd()); // Seed the generator
-    std::uniform_int_distribution<> distr(4, 100); // Define the range
-    int processingTime = distr(eng);
-    expectedCompletionTime = processingTimeLeft;
-    std::cout << "WebServer " << serverID << " is done with a request after " << processingTime << " seconds; IP Out - " << request.getIPOut() << std::endl;
-    available = true;
+    std::random_device rd;
+    std::mt19937 eng(rd());
+    std::uniform_int_distribution<> distr(4, 100); // Random processing time between 4 and 100 seconds
+    processingTimeLeft = distr(eng);
 }
 
 void WebServer::update() {
@@ -24,24 +20,9 @@ void WebServer::update() {
         processingTimeLeft--;
         if (processingTimeLeft == 0) {
             available = true;
+            std::cout << "WebServer " << serverID << " is done; IP Out - " << currentIPOut << std::endl; // Printing server is free
         }
     }
-}
-
-void WebServer::startProcessing(const Request& request) {
-    available = false;
-    std::cout << "WebServer " << serverID << " is processing a request; IP In - " << request.getIPIn() << std::endl;
-
-    // Random processing time between 4 and 100 seconds
-    std::random_device rd;
-    std::mt19937 eng(rd());
-    std::uniform_int_distribution<> distr(4, 100);
-    processingTimeLeft = distr(eng);
-    expectedCompletionTime = processingTimeLeft; // Store the expected completion time
-}
-
-int WebServer::getExpectedCompletionTime() const {
-    return expectedCompletionTime;
 }
 
 bool WebServer::isAvailable() const {
@@ -56,11 +37,3 @@ void WebServer::printStatus() const {
         std::cout << " is processing a request." << std::endl;
     }
 }
-
-// void WebServer::displayRequestDetails(const Request& request) const {
-//     std::cout << " IP In - " << request.getIPIn()
-//               << ", IP Out - " << request.getIPOut()
-//               << std::endl;
-// }
-
-
